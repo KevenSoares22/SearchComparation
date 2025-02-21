@@ -146,6 +146,8 @@ def ant_colony_optimization(cities, iterations=100, ants=20, alpha=1.0, beta=5.0
     # Pré-computa as distâncias e a matriz de heurística (1/distância)
     distances = [[0]*n for _ in range(n)]
     heuristic = [[0]*n for _ in range(n)]
+
+
     for i in range(n):
         for j in range(n):
             if i == j:
@@ -234,63 +236,84 @@ def plot_tour(cities, tour, title, totalTime=0):
 
 # Função principal
 def main():
-    # Gerando cidades aleatórias
-    cities = [(random.randint(0, 100), random.randint(0, 100)) for _ in range(80)]
+    # Gerando cidades aleatórias    
+    
+    
+    
+    accGenetic = 0
+    accTabu = 0
+    accTwoOpt = 0
+    accACO = 0
+    for i in range(20):
+        cities = [(random.randint(0, 100), random.randint(0, 100)) for _ in range(10)]
     
     # Execução e medição do tempo para cada meta-heurística
     
     # Busca Aleatória (pode ser usada como base para o 2-opt)
-    start = time.time()
-    tour_random = random_search(cities)
-    distance_random = total_distance(tour_random, cities)
-    end = time.time()
+        start = time.time()
+        tour_random = random_search(cities)
+        distance_random = total_distance(tour_random, cities)
+        end = time.time()
     #print(f"Distância (Busca Aleatória): {distance_random:.2f}")
     #print(f"Tempo de execução (Busca Aleatória): {end - start:.4f} segundos")
     
     # Algoritmo Genético
-    start = time.time()
-    tour_genetic = genetic_algorithm(cities, generations=100, population_size=50)
-    distance_genetic = total_distance(tour_genetic, cities)
-    end = time.time()
-    totalTimeGenetic = end - start    
-    print(f"Distância (Algoritmo Genético): {distance_genetic:.2f}")
-    print(f"Tempo de execução (Algoritmo Genético): {totalTimeGenetic:.4f} segundos")
+        start = time.time()
+        tour_genetic = genetic_algorithm(cities, generations=100, population_size=50)
+        distance_genetic = total_distance(tour_genetic, cities)
+        end = time.time()
+        totalTimeGenetic = end - start    
+        accGenetic += totalTimeGenetic
+
+        print(f"Distância (Algoritmo Genético): {distance_genetic:.2f}")
+        print(f"Tempo de execução (Algoritmo Genético): {totalTimeGenetic:.4f} segundos")
     
     # 2-opt
-    start = time.time()
-    tour_two_opt = two_opt(cities, tour_random)
-    distance_two_opt = total_distance(tour_two_opt, cities)
-    end = time.time()
-    totalTimeTwo = end - start   
-    print(f"Distância (2-opt): {distance_two_opt:.2f}")
-    print(f"Tempo de execução (2-opt): {totalTimeTwo:.4f} segundos")
+        start = time.time()
+        tour_two_opt = two_opt(cities, tour_random)
+        distance_two_opt = total_distance(tour_two_opt, cities)
+        end = time.time()
+        totalTimeTwo = end - start   
+        accTwoOpt += totalTimeTwo
+        print(f"Distância (2-opt): {distance_two_opt:.2f}")
+        print(f"Tempo de execução (2-opt): {totalTimeTwo:.4f} segundos")
     
     # Busca Tabu
-    start = time.time()
-    tour_tabu = tabu_search(cities, max_iterations=100, tabu_list_size=10)
-    distance_tabu = total_distance(tour_tabu, cities)
-    end = time.time()
-    totalTimeTabu = end - start   
-    print(f"Distância (Busca Tabu): {distance_tabu:.2f}")
-    print(f"Tempo de execução (Busca Tabu): {totalTimeTabu:.4f} segundos")
+        start = time.time()
+        tour_tabu = tabu_search(cities, max_iterations=100, tabu_list_size=10)
+        distance_tabu = total_distance(tour_tabu, cities)
+        end = time.time()
+        totalTimeTabu = end - start   
+        accTabu += totalTimeTabu
+        print(f"Distância (Busca Tabu): {distance_tabu:.2f}")
+        print(f"Tempo de execução (Busca Tabu): {totalTimeTabu:.4f} segundos")
     
     # Ant Colony Optimization (ACO)
-    start = time.time()
-    tour_aco = ant_colony_optimization(cities, iterations=100, ants=20)
-    distance_aco = total_distance(tour_aco, cities)
-    end = time.time()
-    totalTimeAco = end - start   
-    print(f"Distância (ACO): {distance_aco:.2f}")
-    print(f"Tempo de execução (ACO): {totalTimeAco:.4f} segundos")
+        start = time.time()
+        tour_aco = ant_colony_optimization(cities, iterations=100, ants=20)
+        distance_aco = total_distance(tour_aco, cities)
+        end = time.time()
+        totalTimeAco = end - start   
+        accACO += totalTimeAco
+        print(f"Distância (ACO): {distance_aco:.2f}")
+        print(f"Tempo de execução (ACO): {totalTimeAco:.4f} segundos")
+
+
+    accACO = accACO/20
+    accTabu = accTabu/20
+    accTwoOpt = accTwoOpt/20
+    accGenetic = accGenetic/20
     
     # Plotando os tours obtidos
     tours = [tour_genetic, tour_two_opt, tour_tabu, tour_aco]
     titles = [
-        f"Algoritmo Genético ({totalTimeGenetic:.4f}s) - Distância: {distance_genetic:.2f} Km ".replace(".", ","),
-        f"2-opt ({totalTimeTwo:.4f}s) - Distância: {distance_two_opt:.2f} Km ".replace(".", ","),
-        f"Busca Tabu ({totalTimeTabu:.4f}s) - Distância: {distance_tabu:.2f} Km ".replace(".", ","),
-        f"ACO ({totalTimeAco:.4f}s) - Distância: {distance_aco:.2f} Km ".replace(".", ",")
-    ]
+            f"Algoritmo Genético ({accGenetic:.4f}s) - Distância: {distance_genetic:.2f} Km ".replace(".", ","),
+            f"2-opt ({accTwoOpt:.4f}s) - Distância: {distance_two_opt:.2f} Km ".replace(".", ","),
+            f"Busca Tabu ({accTabu:.4f}s) - Distância: {distance_tabu:.2f} Km ".replace(".", ","),
+            f"ACO ({accACO:.4f}s) - Distância: {distance_aco:.2f} Km ".replace(".", ",")
+        ]
+
+
     plot_all_tours(cities, tours, titles)
 
 if __name__ == "__main__":
